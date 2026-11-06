@@ -36,11 +36,9 @@
       <input type="number" id="pageInput" min="1" max="604" />
       <button onclick="changePage(1)">▶</button>
     </div>
-
     <div class="viewer">
       <img id="pageImage" />
     </div>
-
     <div class="player-bar">
       <button onclick="prevAudio()">⏮</button>
       <button onclick="togglePlay()" id="playBtn">▶</button>
@@ -80,12 +78,11 @@
     </div>
 
     <audio id="audio"></audio>
-
     <script>
             // Excel jadvalidagi rasmlar va audiolar havolalari bazasi (JSON formatida)
             const quranDatabase = {
                 images: {
-                   1: "https://www.searchtruth.com/quran/images/images2/large/page-001.jpeg",
+      1: "https://www.searchtruth.com/quran/images/images2/large/page-001.jpeg",
       2: "https://www.searchtruth.com/quran/images/images2/large/page-002.jpeg",
       3: "https://www.searchtruth.com/quran/images/images2/large/page-003.jpeg",
       4: "https://www.searchtruth.com/quran/images/images2/large/page-004.jpeg",
