@@ -1,87 +1,154 @@
+<!DOCTYPE html>
 <html lang="uz">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Qur'on tilovati</title>
     <style>
-      body{margin:0;background:#0f172a;color:#fff;font-family:sans-serif;text-align:center}
-      .controls{position:fixed;bottom:68px;left:50%;transform:translateX(-50%);background:rgba(30,41,59,.9);padding:10px 15px;border-radius:12px;display:flex;gap:8px;align-items:center;z-index:1000}
-      .viewer{margin-top:140px;margin-bottom:80px}
-      #pageImage{width:auto;max-width:100%;height:auto;display:block;margin:0 auto;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.7);transform-origin:top center}
-      .player-bar{position:fixed;bottom:6px;left:50%;transform:translateX(-50%);background:rgba(30,41,59,.95);padding:15px;border-radius:20px;display:flex;align-items:center;gap:10px;white-space:nowrap}
-      button,select{background:#334155;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700;transition:all .2s}
-      button:hover,select:hover{background:#475569}
-      button.active{background:#38bdf8;color:#0f172a}
-      .btn-a.active{background:#10b981;color:#fff}
-      .btn-b.active{background:#10b981;color:#fff}
-      input[type=number]{width:50px;border-radius:5px;border:none;padding:5px;text-align:center}
-      input[type=range]{cursor:pointer}
-      #volume{width:50px}
-      .audio-status{font-size:12px;color:#38bdf8;margin-left:5px;font-weight:700;min-width:45px;display:inline-block}
-      #muteBtn{background:0 0;padding:4px;font-size:16px}
-      .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:2000;justify-content:center;align-items:center}
-      .modal-content{background:#1e293b;border:1px solid rgba(255,255,255,.1);padding:20px 25px;border-radius:14px;max-width:420px;width:90%;text-align:left;box-shadow:0 20px 40px rgba(0,0,0,.8)}
-      .modal-content h3{margin-top:0;color:#38bdf8;font-size:16px;border-bottom:1px solid #334155;padding-bottom:8px}
-      .shortcut-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-top:12px}
-      .shortcut-grid kbd{background:#334155;padding:2px 6px;border-radius:4px;border:1px solid #475569;font-family:monospace}
+        body{margin:0;background:#0f172a;color:#fff;font-family:sans-serif;text-align:center}
+        .controls{position:fixed;bottom:68px;left:50%;transform:translateX(-50%);background:rgba(30,41,59,.9);padding:10px 15px;border-radius:12px;display:flex;gap:8px;align-items:center;z-index:1000}
+        .viewer{margin-top:140px;margin-bottom:80px}
+        #pageImage{width:auto;max-width:100%;height:auto;display:block;margin:0 auto;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.7);transform-origin:top center}
+        .player-bar{position:fixed;bottom:6px;left:50%;transform:translateX(-50%);background:rgba(30,41,59,.95);padding:15px;border-radius:20px;display:flex;align-items:center;gap:10px;white-space:nowrap}
+        button,select{background:#334155;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700;transition:all .2s}
+        button:hover,select:hover{background:#475569}
+        button.active{background:#38bdf8;color:#0f172a}
+        .btn-a.active{background:#10b981;color:#fff}
+        .btn-b.active{background:#10b981;color:#fff}
+        input[type=number]{width:50px;border-radius:5px;border:none;padding:5px;text-align:center}
+        input[type=range]{cursor:pointer}
+        #volume{width:50px}
+        .audio-status{font-size:12px;color:#38bdf8;margin-left:5px;font-weight:700;min-width:45px;display:inline-block}
+        #muteBtn{background:0 0;padding:4px;font-size:16px}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:2000;justify-content:center;align-items:center}
+        .modal-content{background:#1e293b;border:1px solid rgba(255,255,255,.1);padding:20px 25px;border-radius:14px;max-width:420px;width:90%;text-align:left;box-shadow:0 20px 40px rgba(0,0,0,.8)}
+        .modal-content h3{margin-top:0;color:#38bdf8;font-size:16px;border-bottom:1px solid #334155;padding-bottom:8px}
+        .shortcut-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-top:12px}
+        .shortcut-grid kbd{background:#334155;padding:2px 6px;border-radius:4px;border:1px solid #475569;font-family:monospace}
+
+        /* === YON PANEL (GAMBURGER MENYU) UCHUN CSS === */
+        .yon-panel {
+            position: fixed;
+            top: 0;
+            left: -320px; /* Boshlang'ich holatda chapda yashiringan */
+            width: 320px;
+            height: 100vh;
+            background-color: #1e293b;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.8);
+            transition: left 0.3s ease-in-out;
+            z-index: 2500;
+            overflow-y: auto;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+        }
+        .yon-panel.ochiq { left: 0; }
+        .yon-panel-header {
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #38bdf8;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            position: sticky;
+            top: 0;
+        }
+        .yon-panel-yopish { background: none; color: #94a3b8; font-size: 20px; padding: 0; border: none; cursor: pointer; }
+        .yon-panel-yopish:hover { color: #ef4444; background: none;}
+        .yon-panel ul { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
+        .yon-panel li a {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.2s;
+        }
+        .yon-panel li a:hover { background: #334155; color: #fff; }
+        .sura-nomi { font-weight: 600; font-size: 14px; }
+        .sura-sahifa { font-size: 12px; color: #64748b; background: #0f172a; padding: 2px 8px; border-radius: 12px; }
+        
+        #menuToggleBtn { background: #0f172a; border: 1px solid #38bdf8; font-size: 16px; margin-right: 5px; }
+        #menuToggleBtn:hover { background: #38bdf8; color: #0f172a; }
     </style>
-  </head>
-  <body>
+</head>
+<body>
+
+    <!-- YON PANEL HTML TANA -->
+    <nav id="surahMenu" class="yon-panel">
+        <div class="yon-panel-header">
+            Suralar ro'yxati
+            <button class="yon-panel-yopish" onclick="toggleSurahMenu()">✖</button>
+        </div>
+        <ul id="surahList"></ul>
+    </nav>
+
     <div class="controls">
-      <select id="folderSelect" onchange="changeFolder()">
-        <option value="audios1">Alijon qori</option>
-        <option value="audios2">Shayx Muhammad Sodiq tarjima</option>
-      </select>
-      <button onclick="changePage(-1)">◀</button>
-      <input type="number" id="pageInput" min="1" max="604" />
-      <button onclick="changePage(1)">▶</button>
+        <!-- GAMBURGER TUGMASI -->
+        <button id="menuToggleBtn" onclick="event.stopPropagation(); toggleSurahMenu()">&#9776;</button>
+
+        <select id="folderSelect" onchange="changeFolder()">
+            <option value="audios1">Alijon qori</option>
+            <option value="audios2">Shayx Muhammad Sodiq tarjima</option>
+        </select>
+        <button onclick="changePage(-1)">◀</button>
+        <input type="number" id="pageInput" min="1" max="604" />
+        <button onclick="changePage(1)">▶</button>
     </div>
+
     <div class="viewer">
-      <img id="pageImage" />
+        <img id="pageImage" />
     </div>
+
     <div class="player-bar">
-      <button onclick="prevAudio()">⏮</button>
-      <button onclick="togglePlay()" id="playBtn">▶</button>
-      <button onclick="nextAudio()">⏭</button>
-      <span id="currTime">0:00</span>
-      <input type="range" id="progress" value="0" step="0.1" />
-      <span id="durTime">0:00</span>
-      <button onclick="toggleSpeed()" id="speedBtn">1x</button>
-      <button onclick="toggleMute()" id="muteBtn">🔊</button>
-      <input type="range" id="volume" min="0" max="1" step="0.01" value="1" />
-      <button onclick="toggleLoop()" id="loopBtn">🔁</button>
-      <button onclick="setPointA()" id="btnA" class="btn-a">A</button>
-      <button onclick="setPointB()" id="btnB" class="btn-b">B</button>
-      <span id="audioStatus" class="audio-status"></span>
+        <button onclick="prevAudio()">⏮</button>
+        <button onclick="togglePlay()" id="playBtn">▶</button>
+        <button onclick="nextAudio()">⏭</button>
+        <span id="currTime">0:00</span>
+        <input type="range" id="progress" value="0" step="0.1" />
+        <span id="durTime">0:00</span>
+        <button onclick="toggleSpeed()" id="speedBtn">1x</button>
+        <button onclick="toggleMute()" id="muteBtn">🔊</button>
+        <input type="range" id="volume" min="0" max="1" step="0.01" value="1" />
+        <button onclick="toggleLoop()" id="loopBtn">🔁</button>
+        <button onclick="setPointA()" id="btnA" class="btn-a">A</button>
+        <button onclick="setPointB()" id="btnB" class="btn-b">B</button>
+        <span id="audioStatus" class="audio-status"></span>
     </div>
 
     <div id="shortcutModal" class="modal" onclick="toggleModal()">
-      <div class="modal-content" onclick="event.stopPropagation()">
-        <h3>Klaviatura qisqartmalari</h3>
-        <div class="shortcut-grid">
-          <div><kbd>Space / 5</kbd>Play / Pause</div>
-          <div><kbd>← / →</kbd>Sahifa almashtirish</div>
-          <div><kbd>1</kbd>A nuqtani qo'yish</div>
-          <div><kbd>.</kbd>A nuqtaga / A-B bir marta</div>
-          <div><kbd>3</kbd>B nuqtani qo'yish</div>
-          <div><kbd>/</kbd>A-B Loop yoqish/o'chirish</div>
-          <div><kbd>7</kbd>Loopni o'chirish</div>
-          <div><kbd>9</kbd>Loopni yoqish</div>
-          <div><kbd>4 / 6</kbd>-2s / +2s o'tkazish</div>
-          <div><kbd>8 / 2</kbd>Ovoz baland/past</div>
-          <div><kbd>*</kbd>Tezlikni o'zgartirish</div>
-          <div><kbd>M</kbd>Mute (Ovozni o'chirish)</div>
-          <div><kbd>+ / -</kbd>Zoom (Yaqin/Uzoq)</div>
-          <div><kbd>Y / y</kbd>Yordam oynasi</div>
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3>Klaviatura qisqartmalari</h3>
+            <div class="shortcut-grid">
+                <div><kbd>Space / 5</kbd>Play / Pause</div>
+                <div><kbd>← / →</kbd>Sahifa almashtirish</div>
+                <div><kbd>R</kbd>Suralar ro'yxati (Menyu)</div>
+                <div><kbd>1</kbd>A nuqtani qo'yish</div>
+                <div><kbd>.</kbd>A nuqtaga / A-B bir marta</div>
+                <div><kbd>3</kbd>B nuqtani qo'yish</div>
+                <div><kbd>/</kbd>A-B Loop yoqish/o'chirish</div>
+                <div><kbd>7</kbd>Loopni o'chirish</div>
+                <div><kbd>9</kbd>Loopni yoqish</div>
+                <div><kbd>4 / 6</kbd>-2s / +2s o'tkazish</div>
+                <div><kbd>8 / 2</kbd>Ovoz baland/past</div>
+                <div><kbd>*</kbd>Tezlikni o'zgartirish</div>
+                <div><kbd>M</kbd>Mute (Ovozni o'chirish)</div>
+                <div><kbd>+ / -</kbd>Zoom (Yaqin/Uzoq)</div>
+                <div><kbd>Y / y</kbd>Yordam oynasi</div>
+            </div>
         </div>
-      </div>
     </div>
 
     <audio id="audio"></audio>
     <script>
-       const quranDatabase = {
-                images: {
-      1: "https://www.searchtruth.com/quran/images/images2/large/page-001.jpeg",
+        // DIQQAT: O'ZINGIZDAGI TO'LIQ quranDatabase OBYEKTINI SHU YERGA QO'YING
+        const quranDatabase = {
+            images: {
+                    1: "https://www.searchtruth.com/quran/images/images2/large/page-001.jpeg",
       2: "https://www.searchtruth.com/quran/images/images2/large/page-002.jpeg",
       3: "https://www.searchtruth.com/quran/images/images2/large/page-003.jpeg",
       4: "https://www.searchtruth.com/quran/images/images2/large/page-004.jpeg",
@@ -685,11 +752,10 @@
       602: "https://www.searchtruth.com/quran/images/images2/large/page-602.jpeg",
       603: "https://www.searchtruth.com/quran/images/images2/large/page-603.jpeg",
       604: "https://www.searchtruth.com/quran/images/images2/large/page-604.jpeg",
-
-                },
-                audios: {
-                    "audios1": {
-      1: "https://s3.alquran.uz/al-quran-qiroat/ShayxAlijonQori/1-bet.mp3",
+            },
+            audios: {
+                "audios1": {
+                      1: "https://s3.alquran.uz/al-quran-qiroat/ShayxAlijonQori/1-bet.mp3",
       2: "https://s3.alquran.uz/al-quran-qiroat/ShayxAlijonQori/2-bet.mp3",
       3: "https://s3.alquran.uz/al-quran-qiroat/ShayxAlijonQori/3-bet.mp3",
       4: "https://s3.alquran.uz/al-quran-qiroat/ShayxAlijonQori/4-bet.mp3",
@@ -1293,8 +1359,7 @@
       602: "https://s3.alquran.uz/al-quran-qiroat/ShayxAlijonQori/602-bet.mp3",
       603: "https://s3.alquran.uz/al-quran-qiroat/ShayxAlijonQori/603-bet.mp3",
       604: "https://s3.alquran.uz/al-quran-qiroat/ShayxAlijonQori/604-bet.mp3",
-
-               },
+                },
                     "audios2": {
       1: "https://s3.alquran.uz/al-quran-qiroat/ShayxMuhammadsodiqtarjima/001.mp3",
       2: "https://s3.alquran.uz/al-quran-qiroat/ShayxMuhammadsodiqtarjima/002.mp3",
@@ -1904,327 +1969,480 @@
                 }
             };
 
-            let currentPage = localStorage.getItem("page") ? parseInt(localStorage.getItem("page")) : 1;
-            let currentFolder = localStorage.getItem("audioFolder") ? localStorage.getItem("audioFolder") : "audios1";
-            let previousVolume = 1;
+        // ============================================
+        // SURALAR RO'YXATI VA MENYU LOGIKASI
+        // ============================================
+        const suralarJSON = {
+         "سورة الفاتحة - 1. Фотиҳа сураси" : "page-001", 
+"سورة البقرة - 2. Бақара сураси" : "page-002", 
+"سورة آل عمران - 3. Оли Имрон сураси" : "page-050", 
+"سورة النساء - 4. Нисо сураси" : "page-077", 
+"سورة المائدة - 5. Моида сураси" : "page-106", 
+"سورة الأنعام - 6. Анъом сураси" : "page-128", 
+"سورة الأعراف - 7. Аъроф сураси" : "page-151", 
+"سورة الأنفال - 8. Анфол сураси" : "page-177", 
+"سورة التوبة - 9. Тавба сураси" : "page-187", 
+"سورة يونس - 10. Юнус сураси" : "page-208", 
+"سورة هود - 11. Ҳуд сураси" : "page-221", 
+"سورة يوسف - 12. Юсуф сураси" : "page-235", 
+"سورة الرعد - 13. Раъд сураси" : "page-249", 
+"سورة إبراهيم - 14. Иброҳим сураси" : "page-255", 
+"سورة الحجر - 15. Ҳижр сураси" : "page-262", 
+"سورة النحل - 16. Наҳл сураси" : "page-267", 
+"سورة الإسراء - 17. Исро сураси" : "page-282", 
+"سورة الكهف - 18. Каҳф сураси" : "page-293", 
+"سورة مريم - 19. Марям сураси" : "page-305", 
+"سورة طه - 20. Тоҳа сураси" : "page-312", 
+"سورة الأنبياء - 21. Анбия сураси" : "page-322", 
+"سورة الحج - 22. Ҳаж сураси" : "page-332", 
+"سورة المؤمنون - 23. Мўъминун сураси" : "page-342", 
+"سورة النور - 24. Нур сураси" : "page-350", 
+"سورة الفرقان - 25. Фурқон сураси" : "page-359", 
+"سورة الشعراء - 26. Шуъаро сураси" : "page-367", 
+"سورة النمل - 27. Намл сураси" : "page-377", 
+"سورة القصص - 28. Қасас сураси" : "page-385", 
+"سورة العنكبوت - 29. Анкабут сураси" : "page-396", 
+"سورة الروم - 30. Рум сураси" : "page-404", 
+"سورة لقمان - 31. Луқмон сураси" : "page-411", 
+"سورة السجدة - 32. Сажда сураси" : "page-415", 
+"سورة الأحزاب - 33. Аҳзоб сураси" : "page-418", 
+"سورة سبأ - 34. Саба сураси" : "page-428", 
+"سورة فاطر - 35. Фотир сураси" : "page-434", 
+"سورة يس - 36. Ясин сураси" : "page-440", 
+"سورة الصافات - 37. Соффат сураси" : "page-446", 
+"سورة ص - 38. Сод сураси" : "page-453", 
+"سورة الزمر - 39. Зумар сураси" : "page-458", 
+"سورة غافر - 40. Ғофир сураси" : "page-467", 
+"سورة فصلت - 41. Фуссилат сураси" : "page-477", 
+"سورة الشورى - 42. Шуро сураси" : "page-483", 
+"سورة الزخرف - 43. Зуҳруф сураси" : "page-489", 
+"سورة الدخان - 44. Духон сураси" : "page-496", 
+"سورة الجاثية - 45. Жосия сураси" : "page-499", 
+"سورة الأحقاف - 46. Аҳқоф сураси" : "page-502", 
+"سورة محمد - 47. Муҳаммад сураси" : "page-507", 
+"سورة الفتح - 48. Фатҳ сураси" : "page-511", 
+"سورة الحجرات - 49. Ҳужурот сураси" : "page-515", 
+"سورة ق - 50. Қоф сураси" : "page-518", 
+"سورة الذاريات - 51. Зорият сураси" : "page-520", 
+"سورة الطور - 52. Тур сураси" : "page-523", 
+"سورة النجم - 53. Нажм сураси" : "page-526", 
+"سورة القمر - 54. Қамар сураси" : "page-528", 
+"سورة الرحمن - 55. Раҳмон сураси" : "page-531", 
+"سورة الواقعة - 56. Воқиа сураси" : "page-534", 
+"سورة الحديد - 57. Ҳадид сураси" : "page-537", 
+"سورة المجادلة - 58. Мужодала сураси" : "page-542", 
+"سورة الحشر - 59. Ҳашр сураси" : "page-545", 
+"سورة الممتحنة - 60. Мумтаҳина сураси" : "page-549", 
+"سورة الصف - 61. Сафф сураси" : "page-551", 
+"سورة الجمعة - 62. Жумъа сураси" : "page-553", 
+"سورة المنافقون - 63. Мунофиқун сураси" : "page-554", 
+"سورة التغابن - 64. Тагабун сураси" : "page-556", 
+"سورة الطلاق - 65. Талоқ сураси" : "page-558", 
+"سورة التحريم - 66. Таҳрим сураси" : "page-560", 
+"سورة الملك - 67. Мулк сураси" : "page-562", 
+"سورة القلم - 68. Қалам сураси" : "page-564", 
+"سورة الحاقة - 69. Ҳаққо сураси" : "page-566", 
+"سورة المعارج - 70. Маориж сураси" : "page-568", 
+"سورة نوح - 71. Нўҳ сураси" : "page-570", 
+"سورة الجن - 72. Жин сураси" : "page-572", 
+"سورة المزمل - 73. Музаммил сураси" : "page-574", 
+"سورة المدثر - 74. Муддассир сураси" : "page-575", 
+"سورة القيامة - 75. Қиёмат сураси" : "page-577", 
+"سورة الإنسان - 76. Инсон сураси" : "page-578", 
+"سورة المرسلات - 77. Мурсалат сураси" : "page-580", 
+"سورة النبأ - 78. Набаъ сураси" : "page-582", 
+"سورة النازعات - 79. Нозиат сураси" : "page-583", 
+"سورة عبس - 80. Абаса сураси" : "page-585", 
+"سورة التكوير - 81. Таквир сураси" : "page-586", 
+"سورة الإنفطار - 82. Инфитор сураси" : "page-587", 
+"سورة المطففين - 83. Мутаффифин сураси" : "page-587", 
+"سورة الانشقاق - 84. Иншиқоқ сураси" : "page-589", 
+"سورة البروج - 85. Буруж сураси" : "page-590", 
+"سورة الطارق - 86. Ториқ сураси" : "page-591", 
+"سورة الأعلى - 87. Аъло сураси" : "page-591", 
+"سورة الغاشية - 88. Ғошия сураси" : "page-592", 
+"سورة الفجر - 89. Фажр сураси" : "page-593", 
+"سورة البلد - 90. Балад сураси" : "page-594", 
+"سورة الشمس - 91. Шамс сураси" : "page-595", 
+"سورة الليل - 92. Лайл сураси" : "page-595", 
+"سورة الضحى - 93. Зуҳо сураси" : "page-596", 
+"سورة الشرح - 94. Шарҳ сураси" : "page-596", 
+"سورة التين - 95. Тин сураси" : "page-597", 
+"سورة العلق - 96. Алақ сураси" : "page-597", 
+"سورة القدر - 97. Қадр сураси" : "page-598", 
+"سورة البينة - 98. Баййина сураси" : "page-598", 
+"سورة الزلزلة - 99. Залзала сураси" : "page-599", 
+"سورة العاديات - 100. Одиёт сураси" : "page-599", 
+"سورة القارعة - 101. Қориъа сураси" : "page-600", 
+"سورة التكاثر - 102. Такосур сураси" : "page-600", 
+"سورة العصر - 103. Аср сураси" : "page-601", 
+"سورة الهمزة - 104. Ҳумаза сураси" : "page-601", 
+"سورة الفيل - 105. Фил сураси" : "page-601", 
+"سورة قريش - 106. Қурайш сураси" : "page-602", 
+"سورة الماعون - 107. Маъун сураси" : "page-602", 
+"سورة الكوثر - 108. Кавсар сураси" : "page-602", 
+"سورة الكافرون - 109. Кофирун сураси" : "page-603", 
+"سورة النصر - 110. Наср сураси" : "page-603", 
+"سورة المسد - 111. Масад сураси" : "page-603", 
+"سورة الإخلاص - 112. Ихлос сураси" : "page-604", 
+"سورة الفلق - 113. Фалақ сураси" : "page-604", 
+"سورة الناس - 114. Наас сураси" : "page-604"
+        };
 
-            const audio = document.getElementById("audio");
-            const img = document.getElementById("pageImage");
-            const playBtn = document.getElementById("playBtn");
-            const progress = document.getElementById("progress");
-            const volume = document.getElementById("volume");
-            const pageInput = document.getElementById("pageInput");
-            const loopBtn = document.getElementById("loopBtn");
-            const speedBtn = document.getElementById("speedBtn");
-            const folderSelect = document.getElementById("folderSelect");
-            const audioStatus = document.getElementById("audioStatus");
-            const muteBtn = document.getElementById("muteBtn");
-            const btnA = document.getElementById("btnA");
-            const btnB = document.getElementById("btnB");
-            const shortcutModal = document.getElementById("shortcutModal");
+        const surahListEl = document.getElementById("surahList");
+        const surahMenu = document.getElementById("surahMenu");
 
-            let speeds = [0.5, 1, 1.25, 1.5, 2];
-            let speedIndex = 1;
-            let pageLoop = false;
-            let scale = 1;
+        function toggleSurahMenu() {
+            surahMenu.classList.toggle("ochiq");
+        }
 
-            let pointA = null;
-            let pointB = null;
-            let isABLooping = false;
-            let loopInterval = null;
+        Object.entries(suralarJSON).forEach(([suraNomi, sahifaMatni]) => {
+            // "page-001" dagi faqat raqamni olish uchun
+            let sahifaRaqami = parseInt(sahifaMatni.replace("page-", ""), 10);
+            
+            let li = document.createElement("li");
+            let a = document.createElement("a");
+            a.href = "javascript:void(0)";
+            a.innerHTML = `<span class="sura-nomi">${suraNomi}</span> <span class="sura-sahifa">Sahifa: ${sahifaRaqami}</span>`;
+            
+            a.onclick = () => {
+                currentPage = sahifaRaqami; 
+                updateUI(); // Pleyer va Rasmni mos sahifaga olib o'tish
+                toggleSurahMenu(); // O'tgandan keyin menyuni yopish
+            };
+            
+            li.appendChild(a);
+            surahListEl.appendChild(li);
+        });
 
-            folderSelect.value = currentFolder;
+        // Ekranni kuzatish: Ochiq panelning tashqarisiga bossa, yopiladi
+        document.addEventListener('click', function(event) {
+            const menuToggleBtn = document.getElementById('menuToggleBtn');
+            if (surahMenu.classList.contains('ochiq') && !surahMenu.contains(event.target) && event.target !== menuToggleBtn) {
+                surahMenu.classList.remove('ochiq');
+            }
+        });
+        // ============================================
+
+        let currentPage = localStorage.getItem("page") ? parseInt(localStorage.getItem("page")) : 1;
+        let currentFolder = localStorage.getItem("audioFolder") ? localStorage.getItem("audioFolder") : "audios1";
+        let previousVolume = 1;
+
+        const audio = document.getElementById("audio");
+        const img = document.getElementById("pageImage");
+        const playBtn = document.getElementById("playBtn");
+        const progress = document.getElementById("progress");
+        const volume = document.getElementById("volume");
+        const pageInput = document.getElementById("pageInput");
+        const loopBtn = document.getElementById("loopBtn");
+        const speedBtn = document.getElementById("speedBtn");
+        const folderSelect = document.getElementById("folderSelect");
+        const audioStatus = document.getElementById("audioStatus");
+        const muteBtn = document.getElementById("muteBtn");
+        const btnA = document.getElementById("btnA");
+        const btnB = document.getElementById("btnB");
+        const shortcutModal = document.getElementById("shortcutModal");
+
+        let speeds = [0.5, 1, 1.25, 1.5, 2];
+        let speedIndex = 1;
+        let pageLoop = false;
+        let scale = 1;
+
+        let pointA = null;
+        let pointB = null;
+        let isABLooping = false;
+        let loopInterval = null;
+
+        folderSelect.value = currentFolder;
+        updateUI();
+
+        function updateUI() {
+            clearABLoop();
+            if (quranDatabase.images[currentPage]) {
+                img.src = quranDatabase.images[currentPage];
+            }
+            if (quranDatabase.audios[currentFolder] && quranDatabase.audios[currentFolder][currentPage]) {
+                audio.src = quranDatabase.audios[currentFolder][currentPage];
+            }
+            pageInput.value = currentPage;
+            localStorage.setItem("page", currentPage);
+            localStorage.setItem("audioFolder", currentFolder);
+            audio.playbackRate = speeds[speedIndex];
+            audio.play().then(() => playBtn.innerText = "⏸").catch(() => playBtn.innerText = "▶");
+        }
+
+        function changeFolder() {
+            currentFolder = folderSelect.value;
             updateUI();
+        }
 
-            function updateUI() {
-                clearABLoop();
+        function showStatus(text, duration = 1500) {
+            audioStatus.innerText = text;
+            if (duration) {
+                setTimeout(() => {
+                    if (audioStatus.innerText === text) audioStatus.innerText = "";
+                }, duration);
+            }
+        }
 
-                // Rasm havolasini JSON bazadan olish
-                if (quranDatabase.images[currentPage]) {
-                    img.src = quranDatabase.images[currentPage];
+        function toggleModal() {
+            shortcutModal.style.display = shortcutModal.style.display === "flex" ? "none" : "flex";
+        }
+
+        const OFFSET = 0.2;
+        function setPointA() {
+            pointA = Math.max(0, audio.currentTime - OFFSET);
+            btnA.classList.add("active");
+            btnB.classList.remove("active");
+            isABLooping = false;
+            pointB = null;
+            if (loopInterval) clearInterval(loopInterval);
+            showStatus(`A: ${format(pointA)}`);
+        }
+
+        function setPointB() {
+            if (pointA === null) {
+                showStatus("Avval A ni bosing");
+                return;
+            }
+            let calculatedB = audio.currentTime;
+            if (calculatedB <= pointA) {
+                showStatus("B nuqta A dan keyin bo'lishi shart");
+                return;
+            }
+            pointB = calculatedB;
+            btnB.classList.add("active");
+            showStatus(`A-B Bir martalik ijro`);
+            playABOnce();
+        }
+
+        function playABOnce() {
+            if (pointA === null) return;
+            audio.currentTime = pointA;
+            if (audio.paused) {
+                audio.play();
+                playBtn.innerText = "⏸";
+            }
+            if (loopInterval) clearInterval(loopInterval);
+            loopInterval = setInterval(() => {
+                if (!isABLooping && pointB !== null && audio.currentTime >= pointB && !audio.paused) {
+                    audio.pause();
+                    playBtn.innerText = "▶";
+                    clearInterval(loopInterval);
+                    loopInterval = null;
                 }
+            }, 10);
+        }
 
-                // Audio havolasini JSON bazadan olish
-                if (quranDatabase.audios[currentFolder] && quranDatabase.audios[currentFolder][currentPage]) {
-                    audio.src = quranDatabase.audios[currentFolder][currentPage];
+        function toggleABLoop() {
+            if (pointA === null || pointB === null) {
+                showStatus("Avval A va B ni belgilang!");
+                return;
+            }
+            isABLooping = !isABLooping;
+            if (isABLooping) {
+                showStatus("A-B Loop yoqildi");
+                if (audio.currentTime < pointA || audio.currentTime > pointB) {
+                    audio.currentTime = pointA;
                 }
-
-                pageInput.value = currentPage;
-                localStorage.setItem("page", currentPage);
-                localStorage.setItem("audioFolder", currentFolder);
-                audio.playbackRate = speeds[speedIndex];
-                audio.play().then(() => playBtn.innerText = "⏸").catch(() => playBtn.innerText = "▶");
-            }
-
-            function changeFolder() {
-                currentFolder = folderSelect.value;
-                updateUI();
-            }
-
-            function showStatus(text, duration = 1500) {
-                audioStatus.innerText = text;
-                if (duration) {
-                    setTimeout(() => {
-                        if (audioStatus.innerText === text) audioStatus.innerText = "";
-                    }, duration);
-                }
-            }
-
-            function toggleModal() {
-                shortcutModal.style.display = shortcutModal.style.display === "flex" ? "none" : "flex";
-            }
-
-            const OFFSET = 0.2;
-
-            function setPointA() {
-                pointA = Math.max(0, audio.currentTime - OFFSET);
-                btnA.classList.add("active");
-                btnB.classList.remove("active");
-                isABLooping = false;
-                pointB = null;
-                if (loopInterval) clearInterval(loopInterval);
-                showStatus(`A: ${format(pointA)}`);
-            }
-
-            function setPointB() {
-                if (pointA === null) {
-                    showStatus("Avval A ni bosing");
-                    return;
-                }
-                let calculatedB = audio.currentTime;
-                if (calculatedB <= pointA) {
-                    showStatus("B nuqta A dan keyin bo'lishi shart");
-                    return;
-                }
-                pointB = calculatedB;
-                btnB.classList.add("active");
-                showStatus(`A-B Bir martalik ijro`);
-                playABOnce();
-            }
-
-            function playABOnce() {
-                if (pointA === null) return;
-                audio.currentTime = pointA;
                 if (audio.paused) {
                     audio.play();
                     playBtn.innerText = "⏸";
                 }
                 if (loopInterval) clearInterval(loopInterval);
                 loopInterval = setInterval(() => {
-                    if (!isABLooping && pointB !== null && audio.currentTime >= pointB && !audio.paused) {
+                    if (isABLooping && pointB !== null && audio.currentTime >= pointB && !audio.paused) {
+                        audio.pause();
+                        setTimeout(() => {
+                            if (isABLooping) {
+                                audio.currentTime = pointA;
+                                audio.play();
+                            }
+                        }, 200);
+                    } else if (!isABLooping && pointB !== null && audio.currentTime >= pointB && !audio.paused) {
                         audio.pause();
                         playBtn.innerText = "▶";
                         clearInterval(loopInterval);
                         loopInterval = null;
+                        showStatus("A-B yakunlandi");
                     }
                 }, 10);
+            } else {
+                showStatus("A-B Loop o'chirildi");
             }
+        }
 
-            function toggleABLoop() {
-                if (pointA === null || pointB === null) {
-                    showStatus("Avval A va B ni belgilang!");
-                    return;
-                }
-                isABLooping = !isABLooping;
+        function jumpToPointA() {
+            if (pointA !== null) {
                 if (isABLooping) {
-                    showStatus("A-B Loop yoqildi");
-                    if (audio.currentTime < pointA || audio.currentTime > pointB) {
-                        audio.currentTime = pointA;
-                    }
+                    isABLooping = false;
+                    if (loopInterval) clearInterval(loopInterval);
+                }
+                if (pointB !== null) {
+                    playABOnce();
+                    showStatus("A-B ijro etilmoqda");
+                } else {
+                    audio.currentTime = pointA;
                     if (audio.paused) {
                         audio.play();
                         playBtn.innerText = "⏸";
                     }
-                    if (loopInterval) clearInterval(loopInterval);
-                    loopInterval = setInterval(() => {
-                        if (isABLooping && pointB !== null && audio.currentTime >= pointB && !audio.paused) {
-                            audio.pause();
-                            setTimeout(() => {
-                                if (isABLooping) {
-                                    audio.currentTime = pointA;
-                                    audio.play();
-                                }
-                            }, 200);
-                        } else if (!isABLooping && pointB !== null && audio.currentTime >= pointB && !audio.paused) {
-                            audio.pause();
-                            playBtn.innerText = "▶";
-                            clearInterval(loopInterval);
-                            loopInterval = null;
-                            showStatus("A-B yakunlandi");
-                        }
-                    }, 10);
+                    showStatus("A nuqtaga qaytildi");
+                }
+            } else {
+                showStatus("Avval A nuqta belgilanmagan!");
+            }
+        }
+
+        function clearABLoop() {
+            pointA = null;
+            pointB = null;
+            isABLooping = false;
+            if (loopInterval) clearInterval(loopInterval);
+            btnA.classList.remove("active");
+            btnB.classList.remove("active");
+            showStatus("Oraliq o'chirildi");
+        }
+
+        function toggleMute() {
+            if (audio.volume > 0) {
+                previousVolume = audio.volume;
+                audio.volume = 0;
+                volume.value = 0;
+                muteBtn.innerText = "🔇";
+            } else {
+                audio.volume = previousVolume;
+                volume.value = previousVolume;
+                updateMuteIcon(previousVolume);
+            }
+        }
+
+        function updateMuteIcon(vol) {
+            if (vol == 0) muteBtn.innerText = "🔇";
+            else if (vol < 0.5) muteBtn.innerText = "🔉";
+            else muteBtn.innerText = "🔊";
+        }
+
+        function changePage(d) {
+            currentPage += d;
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > 604) currentPage = 604;
+            updateUI();
+        }
+
+        function prevAudio() { changePage(-1); }
+        function nextAudio() { changePage(1); }
+
+        function togglePlay() {
+            if (audio.paused) {
+                if (pointA !== null && pointB !== null && !isABLooping && (audio.currentTime >= pointB || audio.currentTime < pointA)) {
+                    playABOnce();
+                    showStatus("A-B ijro etilmoqda");
                 } else {
-                    showStatus("A-B Loop o'chirildi");
-                }
-            }
-
-            function jumpToPointA() {
-                if (pointA !== null) {
-                    if (isABLooping) {
-                        isABLooping = false;
-                        if (loopInterval) clearInterval(loopInterval);
-                    }
-                    if (pointB !== null) {
-                        playABOnce();
-                        showStatus("A-B ijro etilmoqda");
-                    } else {
-                        audio.currentTime = pointA;
-                        if (audio.paused) {
-                            audio.play();
-                            playBtn.innerText = "⏸";
-                        }
-                        showStatus("A nuqtaga qaytildi");
-                    }
-                } else {
-                    showStatus("Avval A nuqta belgilanmagan!");
-                }
-            }
-
-            function clearABLoop() {
-                pointA = null;
-                pointB = null;
-                isABLooping = false;
-                if (loopInterval) clearInterval(loopInterval);
-                btnA.classList.remove("active");
-                btnB.classList.remove("active");
-                showStatus("Oraliq o'chirildi");
-            }
-
-            function toggleMute() {
-                if (audio.volume > 0) {
-                    previousVolume = audio.volume;
-                    audio.volume = 0;
-                    volume.value = 0;
-                    muteBtn.innerText = "🔇";
-                } else {
-                    audio.volume = previousVolume;
-                    volume.value = previousVolume;
-                    updateMuteIcon(previousVolume);
-                }
-            }
-
-            function updateMuteIcon(vol) {
-                if (vol == 0) muteBtn.innerText = "🔇";
-                else if (vol < 0.5) muteBtn.innerText = "🔉";
-                else muteBtn.innerText = "🔊";
-            }
-
-            function changePage(d) {
-                currentPage += d;
-                if (currentPage < 1) currentPage = 1;
-                if (currentPage > 604) currentPage = 604;
-                updateUI();
-            }
-
-            function prevAudio() { changePage(-1); }
-            function nextAudio() { changePage(1); }
-
-            function togglePlay() {
-                if (audio.paused) {
-                    if (pointA !== null && pointB !== null && !isABLooping && (audio.currentTime >= pointB || audio.currentTime < pointA)) {
-                        playABOnce();
-                        showStatus("A-B ijro etilmoqda");
-                    } else {
-                        audio.play();
-                        playBtn.innerText = "⏸";
-                    }
-                } else {
-                    audio.pause();
-                    playBtn.innerText = "▶";
-                }
-            }
-
-            function toggleSpeed() {
-                speedIndex = (speedIndex + 1) % speeds.length;
-                audio.playbackRate = speeds[speedIndex];
-                speedBtn.innerText = speeds[speedIndex] + "x";
-            }
-
-            function toggleLoop() {
-                pageLoop = !pageLoop;
-                audio.loop = false;
-                loopBtn.classList.toggle("active", pageLoop);
-            }
-
-            audio.ontimeupdate = () => {
-                progress.max = audio.duration || 0;
-                progress.value = audio.currentTime;
-                document.getElementById("currTime").innerText = format(audio.currentTime);
-                document.getElementById("durTime").innerText = format(audio.duration);
-            };
-
-            progress.oninput = () => { audio.currentTime = progress.value; };
-            volume.oninput = () => { audio.volume = volume.value; updateMuteIcon(volume.value); };
-
-            audio.onended = () => {
-                if (loopInterval && !isABLooping) {
-                    clearInterval(loopInterval);
-                    loopInterval = null;
-                    return;
-                }
-                if (isABLooping) return;
-                if (pageLoop) {
-                    audio.currentTime = 0;
                     audio.play();
-                } else {
-                    nextAudio();
+                    playBtn.innerText = "⏸";
                 }
-            };
-
-            function format(s) {
-                if (isNaN(s)) return "0:00";
-                let m = Math.floor(s / 60);
-                let sec = Math.floor(s % 60);
-                return m + ":" + (sec < 10 ? "0" : "") + sec;
+            } else {
+                audio.pause();
+                playBtn.innerText = "▶";
             }
+        }
 
-            document.onkeydown = (e) => {
-                if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
-                switch (e.key) {
-                    case "1": e.preventDefault(); setPointA(); break;
-                    case ".": e.preventDefault(); jumpToPointA(); break;
-                    case "3": e.preventDefault(); setPointB(); break;
-                    case "7": e.preventDefault(); clearABLoop(); break;
-                    case "y": case "Y": e.preventDefault(); toggleModal(); break;
-                    case " ": case "5": e.preventDefault(); togglePlay(); break;
-                    case "ArrowRight": nextAudio(); break;
-                    case "ArrowLeft": prevAudio(); break;
-                    case "+": case "=":
-                        if (!e.ctrlKey) { e.preventDefault(); scale = Math.min(scale + 0.1, 3); img.style.transform = `scale(${scale})`; }
-                        break;
-                    case "-": case "_":
-                        if (!e.ctrlKey) { e.preventDefault(); scale = Math.max(scale - 0.1, 0.8); img.style.transform = `scale(${scale})`; }
-                        break;
-                    case "/": e.preventDefault(); toggleABLoop(); break;
-                    case "*":
-                        e.preventDefault();
-                        speedIndex = (speedIndex + 1) % speeds.length;
-                        audio.playbackRate = speeds[speedIndex];
-                        speedBtn.innerText = speeds[speedIndex] + "x";
-                        break;
-                    case "9": e.preventDefault(); toggleLoop(); break;
-                    case "0": e.preventDefault(); audio.currentTime = 0; showStatus("Boshiga"); break;
-                    case "4": e.preventDefault(); audio.currentTime = Math.max(0, audio.currentTime - 2); showStatus("-2s"); break;
-                    case "6": e.preventDefault(); audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 2); showStatus("+2s"); break;
-                    case "2": e.preventDefault(); audio.volume = Math.max(0, audio.volume - 0.1); volume.value = audio.volume; updateMuteIcon(audio.volume); break;
-                    case "8": e.preventDefault(); audio.volume = Math.min(1, audio.volume + 0.1); volume.value = audio.volume; updateMuteIcon(audio.volume); break;
-                    case "m": case "M": e.preventDefault(); toggleMute(); break;
-                }
-            };
+        function toggleSpeed() {
+            speedIndex = (speedIndex + 1) % speeds.length;
+            audio.playbackRate = speeds[speedIndex];
+            speedBtn.innerText = speeds[speedIndex] + "x";
+        }
 
-            pageInput.onchange = () => {
-                let v = parseInt(pageInput.value);
-                if (v >= 1 && v <= 604) { currentPage = v; updateUI(); }
-            };
+        function toggleLoop() {
+            pageLoop = !pageLoop;
+            audio.loop = false;
+            loopBtn.classList.toggle("active", pageLoop);
+        }
 
-            img.onwheel = (e) => {
-                if (e.ctrlKey) {
+        audio.ontimeupdate = () => {
+            progress.max = audio.duration || 0;
+            progress.value = audio.currentTime;
+            document.getElementById("currTime").innerText = format(audio.currentTime);
+            document.getElementById("durTime").innerText = format(audio.duration);
+        };
+
+        progress.oninput = () => { audio.currentTime = progress.value; };
+        volume.oninput = () => { audio.volume = volume.value; updateMuteIcon(volume.value); };
+
+        audio.onended = () => {
+            if (loopInterval && !isABLooping) {
+                clearInterval(loopInterval);
+                loopInterval = null;
+                return;
+            }
+            if (isABLooping) return;
+            if (pageLoop) {
+                audio.currentTime = 0;
+                audio.play();
+            } else {
+                nextAudio();
+            }
+        };
+
+        function format(s) {
+            if (isNaN(s)) return "0:00";
+            let m = Math.floor(s / 60);
+            let sec = Math.floor(s % 60);
+            return m + ":" + (sec < 10 ? "0" : "") + sec;
+        }
+
+        document.onkeydown = (e) => {
+            if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+            switch (e.key) {
+                case "1": e.preventDefault(); setPointA(); break;
+                case ".": e.preventDefault(); jumpToPointA(); break;
+                case "3": e.preventDefault(); setPointB(); break;
+                case "7": e.preventDefault(); clearABLoop(); break;
+                case "y": case "Y": e.preventDefault(); toggleModal(); break;
+                case " ": case "5": e.preventDefault(); togglePlay(); break;
+                case "ArrowRight": nextAudio(); break;
+                case "ArrowLeft": prevAudio(); break;
+                
+                // Menyuni R harfi yordamida ochib-yopish qoidasi
+                case "r": case "R": e.preventDefault(); toggleSurahMenu(); break;
+
+                case "+": case "=":
+                    if (!e.ctrlKey) { e.preventDefault(); scale = Math.min(scale + 0.1, 3); img.style.transform = `scale(${scale})`; }
+                    break;
+                case "-": case "_":
+                    if (!e.ctrlKey) { e.preventDefault(); scale = Math.max(scale - 0.1, 0.8); img.style.transform = `scale(${scale})`; }
+                    break;
+                case "/": e.preventDefault(); toggleABLoop(); break;
+                case "*":
                     e.preventDefault();
-                    scale += e.deltaY * -0.001;
-                    scale = Math.min(Math.max(0.8, scale), 3);
-                    img.style.transform = `scale(${scale})`;
-                }
-            };
+                    speedIndex = (speedIndex + 1) % speeds.length;
+                    audio.playbackRate = speeds[speedIndex];
+                    speedBtn.innerText = speeds[speedIndex] + "x";
+                    break;
+                case "9": e.preventDefault(); toggleLoop(); break;
+                case "0": e.preventDefault(); audio.currentTime = 0; showStatus("Boshiga"); break;
+                case "4": e.preventDefault(); audio.currentTime = Math.max(0, audio.currentTime - 2); showStatus("-2s"); break;
+                case "6": e.preventDefault(); audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 2); showStatus("+2s"); break;
+                case "2": e.preventDefault(); audio.volume = Math.max(0, audio.volume - 0.1); volume.value = audio.volume; updateMuteIcon(audio.volume); break;
+                case "8": e.preventDefault(); audio.volume = Math.min(1, audio.volume + 0.1); volume.value = audio.volume; updateMuteIcon(audio.volume); break;
+                case "m": case "M": e.preventDefault(); toggleMute(); break;
+            }
+        };
+
+        pageInput.onchange = () => {
+            let v = parseInt(pageInput.value);
+            if (v >= 1 && v <= 604) { currentPage = v; updateUI(); }
+        };
+
+        img.onwheel = (e) => {
+            if (e.ctrlKey) {
+                e.preventDefault();
+                scale += e.deltaY * -0.001;
+                scale = Math.min(Math.max(0.8, scale), 3);
+                img.style.transform = `scale(${scale})`;
+            }
+        };
     </script>
-  </body>
+</body>
 </html>
